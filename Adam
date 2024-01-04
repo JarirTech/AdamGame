@@ -1,0 +1,82 @@
+import pygame
+import sys
+import random
+
+# Initialize Pygame
+pygame.init()
+
+# Constants
+WIDTH, HEIGHT = 800, 600
+BALL_SIZE = 20
+PLAYER_SIZE = 50
+GOAL_WIDTH = 100
+
+# Colors
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
+
+# Initialize screen
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Adam Game")
+
+# Initialize clock
+clock = pygame.time.Clock()
+
+# Initialize player and ball positions
+player_x = (WIDTH - PLAYER_SIZE) // 2
+player_y = HEIGHT - 2 * PLAYER_SIZE
+ball_x = WIDTH // 2
+ball_y = HEIGHT // 2
+ball_speed_x = random.choice([-5, 5])
+ball_speed_y = -5
+
+# Game loop
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+
+    keys = pygame.key.get_pressed()
+
+    # Move player
+    if keys[pygame.K_LEFT] and player_x > 0:
+        player_x -= 5
+    if keys[pygame.K_RIGHT] and player_x < WIDTH - PLAYER_SIZE:
+        player_x += 5
+
+    # Move ball
+    ball_x += ball_speed_x
+    ball_y += ball_speed_y
+
+    # Ball collisions with walls
+    if ball_x <= 0 or ball_x >= WIDTH - BALL_SIZE:
+        ball_speed_x = -ball_speed_x
+
+    if ball_y <= 0:
+        ball_speed_y = -ball_speed_y
+
+    # Ball collision with player
+    if (
+        player_y <= ball_y <= player_y + PLAYER_SIZE
+        and player_x <= ball_x <= player_x + PLAYER_SIZE
+    ):
+        ball_speed_y = -ball_speed_y
+
+    # Draw the background
+    screen.fill(WHITE)
+
+    # Draw the player
+    pygame.draw.rect(screen, BLACK, (player_x, player_y, PLAYER_SIZE, PLAYER_SIZE))
+
+    # Draw the ball
+    pygame.draw.circle(
+        screen, RED, (int(ball_x + BALL_SIZE / 2), int(ball_y + BALL_SIZE / 2)), BALL_SIZE // 2
+    )
+
+    # Update the display
+    pygame.display.flip()
+
+    # Cap the frame rate
+    clock.tick(60)
